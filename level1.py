@@ -3,45 +3,26 @@ import json
 import re
 import numpy as np
 import pprint
+
 url='https://apiv2.twitcasting.tv/internships/2019/games?level=1'
-token= {token is here}
-def check_all_pattern(arr,cor):
-  #愚直に4*4上通り
-  if arr[0]+arr[1]+arr[2]==cor:
-    return '++'
-  if arr[0]+arr[1]-arr[2]==cor:
-    return '+-'
-  if (arr[0]+arr[1])/arr[2]==cor:
-    return '+/'
-  if (arr[0]+arr[1])*arr[2]==cor:
-    return '+*'
+token={token}
+operator=np.array(['+','-', '*', '/'])
 
-  if arr[0]-arr[1]+arr[2]==cor:
-    return '-+'
-  if arr[0]-arr[1]-arr[2]==cor:
-    return '--'
-  if (arr[0]-arr[1])/arr[2]==cor:
-    return '-/'
-  if (arr[0]-arr[1])*arr[2]==cor:
-    return '-*'
+def calculate(arr,sum,opr,i):#数字セットと演算子セットを引数にする
+  if   opr[i] == '+':
+    sum=  sum+arr[i+1];
+  elif opr[i] == '-':
+    sum = sum-arr[i+1]
+  elif opr[i] == '*':
+    sum = sum*arr[i+1]
+  elif opr[i] == '/':
+    sum = sum/arr[i+1]
+  if i<len(arr)-2:
+    i=i+1
+    sum=calculate(arr,sum,opr,i)#再帰
+  return sum
 
-  if arr[0]/arr[1]+arr[2]==cor:
-    return '/+'
-  if arr[0]/arr[1]-arr[2]==cor:
-    return '/-'
-  if (arr[0]/arr[1])/arr[2]==cor:
-    return '//'
-  if (arr[0]/arr[1])*arr[2]==cor:
-    return '/*'
 
-  if arr[0]*arr[1]+arr[2]==cor:
-    return '*+'
-  if arr[0]*arr[1]-arr[2]==cor:
-    return '*-'
-  if arr[0]*arr[1]/arr[2]==cor:
-    return '*/'
-  if arr[0]*arr[1]*arr[2]==cor:
-    return '**'
 headers  = {"content-type": "application/json",'Authorization': token}
 r=requests.get(url,headers=headers)
 print(r)
@@ -55,13 +36,18 @@ ans=int(d.group(2))
 print(num)
 print(ans)
 
-my_ans=check_all_pattern(num,ans)
+a=0
+b=0
+for a in range(0,4):#演算パターンを逐次遂行
+  for b in range(0,4):
+    print(str(num[0]) +operator[a] + str(num[1]) + operator[b] + str(num[2]) + "=" + str(ans))
+    answer= calculate(num,num[0],np.array([operator[a],operator[b]]),0)
+    if answer==ans:
+      break
+  if answer==ans:
+    break
+print(str(num[0]) +operator[a] + str(num[1]) + operator[b] + str(num[2]) + "=" + str(ans))
+my_ans=operator[a]+operator[b]
 print(my_ans)
-
 response = requests.post('https://apiv2.twitcasting.tv/internships/2019/games/'+id,json.dumps({"answer":my_ans}),headers={"content-type": "application/json",'Authorization': token})
-pprint.pprint(response.json())
-
-
-
-
-
+print(response.json())
