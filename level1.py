@@ -25,22 +25,15 @@ def calculate(arr,sum,opr,i):#数字セットと演算子セットを引数に�
 
 headers  = {"content-type": "application/json",'Authorization': token}
 r=requests.get(url,headers=headers)
-print(r)
 data=r.json()
-print(json.dumps(data, indent=4))
 id=data['id']
 question=data['question']
 d = re.search("(.*)=(.*)", question)
 num=np.array(d.group(1).rsplit("?"),np.int32)
 ans=int(d.group(2))
-print(num)
-print(ans)
 
-a=0
-b=0
 for a in range(0,4):#演算パターンを逐次遂行
   for b in range(0,4):
-    print(str(num[0]) +operator[a] + str(num[1]) + operator[b] + str(num[2]) + "=" + str(ans))
     answer= calculate(num,num[0],np.array([operator[a],operator[b]]),0)
     if answer==ans:
       break
@@ -48,6 +41,5 @@ for a in range(0,4):#演算パターンを逐次遂行
     break
 print(str(num[0]) +operator[a] + str(num[1]) + operator[b] + str(num[2]) + "=" + str(ans))
 my_ans=operator[a]+operator[b]
-print(my_ans)
 response = requests.post('https://apiv2.twitcasting.tv/internships/2019/games/'+id,json.dumps({"answer":my_ans}),headers={"content-type": "application/json",'Authorization': token})
 print(response.json())
